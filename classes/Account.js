@@ -65,12 +65,14 @@ export class Account {
     this._assertOpen();
     this._assertAmount(amount);
 
-    const newBalance = this.#balance - amount;
+    const currentBalance = this.getBalance();
+    const newBalance = currentBalance - amount;
+
     if (newBalance < 0) {
       throw new Error("INSUFFICIENT_FUNDS");
     }
 
-    this.#balance = newBalance;
+    this._setBalance(newBalance);
 
     return this._createTransaction("withdrawal", amount);
   }
@@ -110,6 +112,17 @@ export class Account {
     if (currency !== this.currency) {
       throw new Error("CURRENCY_MISMATCH");
     }
+  }
+
+  /**
+   * Protected helper to update the private balance.
+   * Subclasses should use this instead of touching #balance.
+   *
+   * @protected
+   * @param {number} newBalance
+   */
+  _setBalance(newBalance) {
+    this.#balance = newBalance;
   }
 
   // ------------------------------
